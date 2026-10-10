@@ -1,0 +1,106 @@
+GROWTHPILOT AI — BEGINNER SETUP GUIDE (WINDOWS + VS CODE)
+=========================================================
+
+A. WHAT YOU WILL BUILD
+----------------------
+A local Streamlit website with a marketing KPI dashboard, CSV upload, a Gemini chat
+assistant, and an optional connection to your existing n8n webhook.
+
+B. OPEN IT IN VS CODE
+---------------------
+1. Extract GrowthPilotAI_Project.zip to a folder you can find easily.
+2. Open VS Code.
+3. Select File > Open Folder.
+4. Choose the extracted GrowthPilotAI_Project folder.
+5. Select Terminal > New Terminal.
+
+C. INSTALL PYTHON DEPENDENCIES
+------------------------------
+In the VS Code terminal, run each command separately:
+
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+If py -3.12 is not recognized, use:
+py -m venv .venv
+
+If PowerShell blocks activation, use Command Prompt in VS Code and run:
+.venv\Scripts\activate.bat
+
+D. ADD GEMINI KEY WITHOUT PUTTING IT IN CODE
+--------------------------------------------
+1. In the VS Code Explorer, open the .streamlit folder.
+2. Copy secrets.toml.example and rename the copy to secrets.toml.
+3. Open secrets.toml.
+4. Replace PASTE_YOUR_GEMINI_API_KEY_HERE with your actual Gemini key.
+5. Save it.
+6. Never upload secrets.toml to GitHub. .gitignore is configured to exclude it.
+
+E. RUN THE APP
+--------------
+In the terminal, run:
+python -m streamlit run app.py
+
+Open http://localhost:8501 if the browser does not open automatically.
+Keep the terminal running.
+
+F. TRY THE DASHBOARD
+--------------------
+1. Inspect the sample campaign data.
+2. Edit the rows or upload a CSV.
+3. Ask GrowthPilot AI a marketing question in the chat at the bottom.
+4. Inspect the KPI cards and answer.
+
+CSV columns expected:
+channel, spend, attributed_revenue, orders, new_customers, sessions
+Optional: conversions
+
+G. CONNECT YOUR EXISTING N8N WORKFLOW (OPTIONAL)
+------------------------------------------------
+1. Make sure the n8n workflow is active/published for its production URL.
+2. In the app sidebar, turn on "Route questions through my n8n workflow".
+3. For local use on the same computer, enter:
+   http://localhost:5678/webhook/growthpilot-chat
+4. Ask a question in the Streamlit chat.
+
+For the n8n webhook, the workflow should accept message, business, currency, data and
+metrics, and return JSON containing reply or output. If your current response node
+returns only reply, that is fine.
+
+For a deployed website, localhost points to the cloud server, not your laptop.
+Deploy n8n to a secure reachable HTTPS endpoint before enabling cloud-to-n8n routing.
+Do not expose an unauthenticated workflow publicly.
+
+H. DEPLOY A SHAREABLE ONLINE WEBSITE
+------------------------------------
+1. Create a GitHub repository.
+2. Upload the project files except .streamlit/secrets.toml and .venv.
+3. Check that secrets.toml is excluded by .gitignore.
+4. Visit https://share.streamlit.io/ and sign in using GitHub.
+5. Click Create app.
+6. Select your repository, branch and app.py.
+7. In Advanced settings / Secrets, paste the TOML settings with your real Gemini key.
+8. Deploy and open the generated streamlit.app URL.
+
+For cloud hosting, direct Gemini mode works with the hosted secret. n8n mode will only
+work if N8N_WEBHOOK_URL points to a secured, publicly reachable HTTPS endpoint.
+
+I. COMMON ERRORS
+----------------
+ModuleNotFoundError: install dependencies with pip install -r requirements.txt.
+Invalid key / 400 or 401: verify the key and model access.
+429: quota/rate limit; inspect usage and retry later.
+503: temporary model service issue; retry or choose another available model.
+n8n 404: use test URL only while listening; production URL requires active/published workflow.
+App doesn't start: ensure terminal is in the project folder and .venv is activated.
+
+J. IMPORTANT METRIC NOTES
+-------------------------
+ROAS = attributed revenue / ad spend; ROAS is not profit.
+CAC proxy = ad spend / new customers; it may exclude other acquisition costs.
+AOV = attributed revenue / orders.
+Conversion rate = conversions / sessions; the app requires a separate conversions column
+and does not silently assume orders are conversions.
+AI recommendations are advisory and must be validated before consequential actions.
